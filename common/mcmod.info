@@ -1,0 +1,20 @@
+[
+{
+  "modid": "FPGA3D",
+  "name": "FPGA3D",
+  "description": "FPGA mod, 3D version",
+  "version": "0.1",
+  "url": "",
+  "updateUrl": "",
+  "authorList": [
+    "rhilenova"
+  ],
+  "credits": "By rhilenova, in competition with eakmeister",
+  "logoFile": "",
+  "screenshots": [
+  ],
+  "parent":"",
+  "dependencies": [
+  ]
+}
+]
