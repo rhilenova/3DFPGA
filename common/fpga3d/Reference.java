@@ -22,4 +22,11 @@ public class Reference {
     {
     	public static final int FPGA = 2540;
     }
+    
+    public static final class Textures
+    {
+        public static final String GUI_SHEET_LOCATION = "/mods/fpga3d/textures/gui/";
+        
+    	public static final String GUI_FPGA = GUI_SHEET_LOCATION + "fpga.png";
+    }
 }

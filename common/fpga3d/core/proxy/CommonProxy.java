@@ -33,7 +33,7 @@ public class CommonProxy implements IGuiHandler
 		if (ID == Reference.GuiIDs.FPGA)
 		{
 			System.out.println("GetClientGUI - FPGA");
-            return new GuiScreenFPGA(player, world, x, y, z);
+            return new GuiScreenFPGA();
 		}
 		return null;
 	}
