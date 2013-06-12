@@ -11,11 +11,14 @@ public class GuiScreenFPGA extends GuiContainer
     int num_endpoints;
     int num_numbers;
     
+    int last_endpoint;
+    
 	public GuiScreenFPGA()
 	{
 		super(new ContainerFPGA());
 		this.xSize = 223;
 		this.ySize = 186;
+		last_endpoint = -1;
 	}
 	
 	/**
@@ -32,10 +35,10 @@ public class GuiScreenFPGA extends GuiContainer
         	{{13, 114}, {13, 122}, {13, 130}, {13, 138}, {13, 146}, {13, 154},
         	// LUT Inputs
         	{36, 45}, {36, 53}, {36, 61},
-        	// LUT Outputs
-        	{119, 49}, {119, 57},
         	// FF Inputs
         	{139, 118}, {139, 126}, {139, 151}, {139, 159},
+        	// LUT Outputs
+        	{119, 49}, {119, 57},
         	// FF Outputs
         	{180, 118}, {180, 126}, {180, 151}, {180, 159},
         	// Outputs
@@ -73,11 +76,99 @@ public class GuiScreenFPGA extends GuiContainer
      */
     protected void actionPerformed(GuiButton par1GuiButton)
     {
-    	System.out.println("Button " + par1GuiButton.id);
-    	if (par1GuiButton.id >= num_endpoints && par1GuiButton.id < num_endpoints + num_numbers)
+    	int ID = par1GuiButton.id;
+    	if (ID >= 0 && ID < num_endpoints)
     	{
-        	int number_id = (par1GuiButton.id - num_endpoints) / 2;
-        	int number_mod = (par1GuiButton.id - num_endpoints) % 2;
+    		if (last_endpoint == -1)
+    		{
+    			last_endpoint = ID;
+    		}
+    		else
+    		{
+    			// Inputs
+    			if (last_endpoint < 6)
+    			{
+    				if (ID <= 5 || ID >= 13)
+    				{
+    					last_endpoint = ID;
+    				}
+    				else
+    				{
+    					System.out.println("Connected " + last_endpoint + " to " + ID);
+    					last_endpoint = -1;
+    				}
+    			}
+    			// LUT Inputs
+    			else if (last_endpoint >= 6 && last_endpoint <= 8)
+    			{
+    				if (ID >= 6)
+    				{
+    					last_endpoint = ID;
+    				}
+    				else
+    				{
+    					System.out.println("Connected " + last_endpoint + " to " + ID);
+    					last_endpoint = -1;
+    				}
+    			}
+    			// FF Inputs
+    			else if (last_endpoint >= 9 && last_endpoint <= 12)
+    			{
+    				if ((6 <= ID && ID <= 12) || ID >= 15)
+    				{
+    					last_endpoint = ID;
+    				}
+    				else
+    				{
+    					System.out.println("Connected " + last_endpoint + " to " + ID);
+    					last_endpoint = -1;
+    				}
+    			}
+    			// LUT Outputs
+    			else if (last_endpoint >= 13 && last_endpoint <= 14)
+    			{
+    				if ((13 <= ID && ID <= 18) || ID <= 8)
+    				{
+    					last_endpoint = ID;
+    				}
+    				else
+    				{
+    					System.out.println("Connected " + last_endpoint + " to " + ID);
+    					last_endpoint = -1;
+    				}
+    			}
+    			// FF Outputs
+    			else if (last_endpoint >= 15 && last_endpoint <= 18)
+    			{
+    				if (ID <= 18)
+    				{
+    					last_endpoint = ID;
+    				}
+    				else
+    				{
+    					System.out.println("Connected " + last_endpoint + " to " + ID);
+    					last_endpoint = -1;
+    				}
+    			}
+    			// Outputs
+    			else if (last_endpoint >= 19)
+    			{
+    				if (ID >= 19 || ID <= 12)
+    				{
+    					last_endpoint = ID;
+    				}
+    				else
+    				{
+    					System.out.println("Connected " + last_endpoint + " to " + ID);
+    					last_endpoint = -1;
+    				}
+    			}
+    		}
+    	}
+    	else if (ID >= num_endpoints && ID < num_endpoints + num_numbers)
+    	{
+        	int number_id = (ID - num_endpoints) / 2;
+        	int number_mod = (ID - num_endpoints) % 2;
         	number_vals[number_id] = number_vals[number_id] ^ (0x10 >> (4 * number_mod));
     	}
     }
