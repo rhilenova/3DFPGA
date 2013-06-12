@@ -33,19 +33,16 @@ public class BlockFPGA extends Block implements ITileEntityProvider
      */
     public boolean onBlockActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9)
     {
-    	System.out.println("Activated");
         if (par1World.isRemote)
         {
             return true;
         }
         else
         {
-        	System.out.println("Activated - client");
             TileEntityFPGA tileentityfpga = (TileEntityFPGA) par1World.getBlockTileEntity(x, y, z);
 
             if (tileentityfpga != null)
             {
-            	System.out.println("Activated - tileentity");
                 par5EntityPlayer.openGui(FPGA3D.instance, Reference.GuiIDs.FPGA, par1World, x, y, z);
             }
 

@@ -29,10 +29,8 @@ public class CommonProxy implements IGuiHandler
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world,
 			int x, int y, int z)
 	{
-		System.out.println("GetClientGUI");
 		if (ID == Reference.GuiIDs.FPGA)
 		{
-			System.out.println("GetClientGUI - FPGA");
             return new GuiScreenFPGA();
 		}
 		return null;
