@@ -13,6 +13,13 @@ public class GuiScreenFPGA extends GuiContainer
     
     int last_endpoint;
     
+    int[] lut_inputs = {-1, -1, -1};
+    int[] input_colors = {-2236963, -2392770, -5025604, -9729335, -5134809, -12472776};
+    
+    final static int LUT1 = 21;
+    final static int LUT2 = 25;
+    final static int LUT3 = 28;
+    
 	public GuiScreenFPGA()
 	{
 		super(new ContainerFPGA());
@@ -88,10 +95,19 @@ public class GuiScreenFPGA extends GuiContainer
     			// Inputs
     			if (last_endpoint < 6)
     			{
+    				// New first click
     				if (ID <= 5 || ID >= 13)
     				{
     					last_endpoint = ID;
     				}
+    				// LUT inputs
+    				else if (ID >= 6 && ID <= 8)
+    				{
+    					System.out.println("Connected " + last_endpoint + " to " + ID);
+    					lut_inputs[ID-6] = last_endpoint;
+    					last_endpoint = -1;
+    				}
+    				// FF inputs
     				else
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
@@ -103,11 +119,13 @@ public class GuiScreenFPGA extends GuiContainer
     			{
     				if (ID >= 6)
     				{
+    					if (ID == last_endpoint) lut_inputs[ID-6] = -1;
     					last_endpoint = ID;
     				}
     				else
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
+    					lut_inputs[last_endpoint-6] = ID;
     					last_endpoint = -1;
     				}
     			}
@@ -200,6 +218,14 @@ public class GuiScreenFPGA extends GuiContainer
     	fontRenderer.drawString("Clk", 149, 160, 4210752);
     	fontRenderer.drawString("Q", 169, 150, 4210752);
     	fontRenderer.drawString("Q'", 169, 160, 4210752);
+    	
+		for (int l_input = 0; l_input < 3; ++l_input)
+		{
+			if (lut_inputs[l_input] >= 0)
+			{
+		    	drawRect(l_input*50, l_input*50, l_input*50+50, l_input*50+50, input_colors[lut_inputs[l_input]]);
+			}
+		}
 	}
 	
 	@Override
