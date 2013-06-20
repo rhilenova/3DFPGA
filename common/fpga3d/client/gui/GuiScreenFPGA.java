@@ -104,6 +104,13 @@ public class GuiScreenFPGA extends GuiContainer
     				else if (ID >= 6 && ID <= 8)
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
+    					for (int x = 0; x < 3; ++x)
+    					{
+    						if (lut_inputs[x] == last_endpoint)
+							{
+    							lut_inputs[x] = -1;
+							}
+    					}
     					lut_inputs[ID-6] = last_endpoint;
     					last_endpoint = -1;
     				}
@@ -125,6 +132,13 @@ public class GuiScreenFPGA extends GuiContainer
     				else
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
+    					for (int x = 0; x < 3; ++x)
+    					{
+    						if (lut_inputs[x] == ID)
+							{
+    							lut_inputs[x] = -1;
+							}
+    					}
     					lut_inputs[last_endpoint-6] = ID;
     					last_endpoint = -1;
     				}
@@ -219,12 +233,31 @@ public class GuiScreenFPGA extends GuiContainer
     	fontRenderer.drawString("Q", 169, 150, 4210752);
     	fontRenderer.drawString("Q'", 169, 160, 4210752);
     	
-		for (int l_input = 0; l_input < 3; ++l_input)
+		if (lut_inputs[0] >= 0)
 		{
-			if (lut_inputs[l_input] >= 0)
-			{
-		    	drawRect(l_input*50, l_input*50, l_input*50+50, l_input*50+50, input_colors[lut_inputs[l_input]]);
-			}
+	    	drawRect(21, 47, 23, 118 + (8 * lut_inputs[0]), input_colors[lut_inputs[0]]);
+	    	drawRect(23, 47, 36, 49, input_colors[lut_inputs[0]]);
+	    	drawRect(19, 116 + (8 * lut_inputs[0]), 21, 118 + (8 * lut_inputs[0]), input_colors[lut_inputs[0]]);
+	    	drawRect(37, 47, 41, 49, input_colors[lut_inputs[0]]);
+	    	drawRect(38, 46, 40, 50, input_colors[lut_inputs[0]]);
+		}
+		
+		if (lut_inputs[1] >= 0)
+		{
+	    	drawRect(25, 55, 27, 118 + (8 * lut_inputs[1]), input_colors[lut_inputs[1]]);
+	    	drawRect(25, 55, 36, 57, input_colors[lut_inputs[1]]);
+	    	drawRect(19, 116 + (8 * lut_inputs[1]), 25, 118 + (8 * lut_inputs[1]), input_colors[lut_inputs[1]]);
+	    	drawRect(37, 55, 41, 57, input_colors[lut_inputs[1]]);
+	    	drawRect(38, 54, 40, 58, input_colors[lut_inputs[1]]);
+		}
+		
+		if (lut_inputs[2] >= 0)
+		{
+	    	drawRect(29, 63, 31, 118 + (8 * lut_inputs[2]), input_colors[lut_inputs[2]]);
+	    	drawRect(29, 63, 36, 65, input_colors[lut_inputs[2]]);
+	    	drawRect(19, 116 + (8 * lut_inputs[2]), 29, 118 + (8 * lut_inputs[2]), input_colors[lut_inputs[2]]);
+	    	drawRect(37, 63, 41, 65, input_colors[lut_inputs[2]]);
+	    	drawRect(38, 62, 40, 66, input_colors[lut_inputs[2]]);
 		}
 	}
 	
