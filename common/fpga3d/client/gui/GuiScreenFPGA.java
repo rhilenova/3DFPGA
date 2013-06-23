@@ -1,5 +1,7 @@
 package fpga3d.client.gui;
 
+import java.util.Arrays;
+
 import fpga3d.Reference;
 import fpga3d.inventory.ContainerFPGA;
 import net.minecraft.client.gui.GuiButton;
@@ -7,15 +9,65 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 
 public class GuiScreenFPGA extends GuiContainer
 {
+	//----------NEW----------
+    class routing_struct
+    {
+    	routing_struct(int _l, int _t, int _r)
+    	{
+    		left = _l;
+    		top = _t;
+    		right = _r;
+    	}
+    	public int left;
+    	public int top;
+    	public int right;
+    }
+
+    routing_struct[] routing =
+    {
+    	// Inputs
+		new routing_struct(19, 116, -1),
+		new routing_struct(19, 124, -1),
+		new routing_struct(19, 132, -1),
+		new routing_struct(19, 140, -1),
+		new routing_struct(19, 148, -1),
+		new routing_struct(19, 156, -1),
+		// LUT Inputs
+		new routing_struct(21, 47, 36),
+		new routing_struct(25, 55, 36),
+		new routing_struct(29, 63, 36),
+		// FF Inputs
+		new routing_struct(139, 120, 143),
+		new routing_struct(135, 128, 143),
+		new routing_struct(131, 153, 143),
+		new routing_struct(127, 161, 143),
+		// LUT Outputs
+		new routing_struct(125, 51, -1),
+		new routing_struct(125, 59, -1),
+		// FF Outputs
+		new routing_struct(190, 120, -1),
+		new routing_struct(190, 128, -1),
+		new routing_struct(190, 153, -1),
+		new routing_struct(190, 161, -1),
+		// Outputs
+		new routing_struct(192, 31, 216),
+		new routing_struct(196, 39, 216),
+		new routing_struct(200, 47, 216),
+		new routing_struct(204, 55, 216),
+		new routing_struct(208, 63, 216),
+		new routing_struct(212, 71, 216)
+	};
+
+    int[] connections = new int[13];
+    int[] array_idx = {6, 7, 8, 9, 10, 11, 12, 19, 20, 21, 22, 23, 24};
+    
+    //----------OLD----------
     int[] number_vals = {0, 0, 0, 0, 0, 0, 0, 0};
     int num_endpoints;
     int num_numbers;
     
     int last_endpoint;
-    
-    int[] lut_inputs = {-1, -1, -1};
-    int[] ff_inputs = {-1, -1, -1, -1};
-    int[] outputs = {-1, -1, -1, -1, -1, -1};
+
     int[] input_colors = {-2236963, -2392770, -5025604, -9729335, -5134809, -12472776,
     					  0, 0, 0, 0, 0, 0, 0, // Spaces for LUT and FF inputs
     					  -3111783, -12566464, -6643295, -13734263, -8503883, -13748083,
@@ -52,7 +104,7 @@ public class GuiScreenFPGA extends GuiContainer
         	// FF Outputs
         	{184, 118}, {184, 126}, {184, 151}, {184, 159},
         	// Outputs
-        	{216, 26}, {216, 34}, {216, 42}, {216, 50}, {216, 58}, {216, 66}};
+        	{216, 29}, {216, 37}, {216, 45}, {216, 53}, {216, 61}, {216, 69}};
         num_endpoints = endpoint_locs.length;
         for (int x = 0; x < endpoint_locs.length; ++x)
         {
@@ -79,6 +131,9 @@ public class GuiScreenFPGA extends GuiContainer
         	temp.drawButton = false;
         	buttonList.add(temp);
         }
+        
+        //----------NEW----------
+        Arrays.fill(connections, -1);
     }
     
     /**
@@ -102,30 +157,22 @@ public class GuiScreenFPGA extends GuiContainer
     				if (ID == last_endpoint)
     				{
     					last_endpoint = -1;
-    					for (int x = 0; x < 3; ++x)
+    					for (int x = 0; x < connections.length; ++x)
     					{
-    						if (lut_inputs[x] == ID) lut_inputs[x] = -1;
-    						if (ff_inputs[x] == ID) ff_inputs[x] = -1;
+    						if (connections[x] == ID) connections[x] = -1;
     					}
-    					if (ff_inputs[3] == ID) ff_inputs[3] = -1;
     				}
     				// New first click
     				else if (ID <= 5 || ID >= 13)
     				{
     					last_endpoint = ID;
     				}
-    				// LUT inputs
-    				else if (ID >= 6 && ID <= 8)
-    				{
-    					System.out.println("Connected " + last_endpoint + " to " + ID);
-    					lut_inputs[ID-6] = last_endpoint;
-    					last_endpoint = -1;
-    				}
-    				// FF inputs
+    				// Connection
     				else
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
-    					ff_inputs[ID-9] = last_endpoint;
+    					int idx = Arrays.binarySearch(array_idx, ID);
+    					connections[idx] = last_endpoint;
     					last_endpoint = -1;
     				}
     			}
@@ -135,7 +182,8 @@ public class GuiScreenFPGA extends GuiContainer
     				// Clear connections
     				if (ID == last_endpoint)
     				{
-    					lut_inputs[ID-6] = -1;
+    					int idx = Arrays.binarySearch(array_idx, ID);
+    					connections[idx] = -1;
     					last_endpoint = -1;
     				}
     				// New first click
@@ -143,11 +191,12 @@ public class GuiScreenFPGA extends GuiContainer
     				{
     					last_endpoint = ID;
     				}
-    				// Connect to input
+    				// Connection
     				else
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
-    					lut_inputs[last_endpoint-6] = ID;
+    					int idx = Arrays.binarySearch(array_idx, last_endpoint);
+    					connections[idx] = ID;
     					last_endpoint = -1;
     				}
     			}
@@ -157,7 +206,8 @@ public class GuiScreenFPGA extends GuiContainer
     				// Clear connections
     				if (ID == last_endpoint)
     				{
-    					ff_inputs[ID-9] = -1;
+    					int idx = Arrays.binarySearch(array_idx, ID);
+    					connections[idx] = -1;
     					last_endpoint = -1;
     				}
     				// New first click
@@ -165,11 +215,12 @@ public class GuiScreenFPGA extends GuiContainer
     				{
     					last_endpoint = ID;
     				}
-    				// Connect
+    				// Connection
     				else
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
-    					ff_inputs[last_endpoint-9] = ID;
+    					int idx = Arrays.binarySearch(array_idx, last_endpoint);
+    					connections[idx] = ID;
     					last_endpoint = -1;
     				}
     			}
@@ -180,9 +231,9 @@ public class GuiScreenFPGA extends GuiContainer
     				if (ID == last_endpoint)
     				{
     					last_endpoint = -1;
-    					for (int x = 0; x < 4; ++x)
+    					for (int x = 0; x < connections.length; ++x)
     					{
-    						if (ff_inputs[x] == ID) ff_inputs[x] = -1;
+    						if (connections[x] == ID) connections[x] = -1;
     					}
     				}
     				// New first click
@@ -190,18 +241,12 @@ public class GuiScreenFPGA extends GuiContainer
     				{
     					last_endpoint = ID;
     				}
-    				// FF Inputs
-    				else if (9 <= ID && ID <= 12)
-    				{
-    					System.out.println("Connected " + last_endpoint + " to " + ID);
-    					ff_inputs[ID-9] = last_endpoint;
-    					last_endpoint = -1;
-    				}
-    				// Outputs
+    				// Connection
     				else
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
-    					outputs[ID-19] = last_endpoint;
+    					int idx = Arrays.binarySearch(array_idx, ID);
+    					connections[idx] = last_endpoint;
     					last_endpoint = -1;
     				}
     			}
@@ -212,9 +257,9 @@ public class GuiScreenFPGA extends GuiContainer
     				if (ID == last_endpoint)
     				{
     					last_endpoint = -1;
-    					for (int x = 0; x < 6; ++x)
+    					for (int x = 0; x < connections.length; ++x)
     					{
-    						if (outputs[x] == ID) outputs[x] = -1;
+    						if (connections[x] == ID) connections[x] = -1;
     					}
     				}
     				// New first click
@@ -222,10 +267,12 @@ public class GuiScreenFPGA extends GuiContainer
     				{
     					last_endpoint = ID;
     				}
+    				// Connection
     				else
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
-    					outputs[ID-19] = last_endpoint;
+    					int idx = Arrays.binarySearch(array_idx, ID);
+    					connections[idx] = last_endpoint;
     					last_endpoint = -1;
     				}
     			}
@@ -235,7 +282,8 @@ public class GuiScreenFPGA extends GuiContainer
     				// Clear connections
     				if (ID == last_endpoint)
     				{
-    					outputs[ID-19] = -1;
+    					int idx = Arrays.binarySearch(array_idx, ID);
+    					connections[idx] = -1;
     					last_endpoint = -1;
     				}
     				// New first click
@@ -247,7 +295,8 @@ public class GuiScreenFPGA extends GuiContainer
     				else
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
-    					outputs[last_endpoint-19] = ID;
+    					int idx = Arrays.binarySearch(array_idx, last_endpoint);
+    					connections[idx] = ID;
     					last_endpoint = -1;
     				}
     			}
@@ -288,161 +337,29 @@ public class GuiScreenFPGA extends GuiContainer
     	fontRenderer.drawString("Clk", 152, 160, 4210752);
     	fontRenderer.drawString("Q", 172, 150, 4210752);
     	fontRenderer.drawString("Q'", 172, 160, 4210752);
-    	
-    	for (int lut = 0; lut < 3; ++lut)
+
+    	for (int connection = 0; connection < connections.length; ++connection)
     	{
-    		if (lut_inputs[lut] >= 0)
+    		int from_id = connections[connection];
+    		int to_id = array_idx[connection];
+    		if (from_id >= 0)
     		{
-	    		drawRect(lut_routing[lut][0], lut_routing[lut][1], lut_routing[lut][0] + 2, 118 + (8 * lut_inputs[lut]), input_colors[lut_inputs[lut]]);
-		    	drawRect(lut_routing[lut][0] + 2, lut_routing[lut][1], 36, lut_routing[lut][1] + 2, input_colors[lut_inputs[lut]]);
-		    	drawRect(19, 116 + (8 * lut_inputs[lut]), lut_routing[lut][0], 118 + (8 * lut_inputs[lut]), input_colors[lut_inputs[lut]]);
-		    	drawRect(37, lut_routing[lut][1], 41, lut_routing[lut][1] + 2, input_colors[lut_inputs[lut]]);
-		    	drawRect(38, lut_routing[lut][1] - 1, 40, lut_routing[lut][1] + 3, input_colors[lut_inputs[lut]]);
+    			// Draw start bar
+    			drawRect(routing[from_id].left, routing[from_id].top, routing[to_id].left, routing[from_id].top + 2, input_colors[from_id]);
+    			// Draw end bar
+    			drawRect(routing[to_id].left, routing[to_id].top, routing[to_id].right, routing[to_id].top + 2, input_colors[from_id]);
+    			// Draw connector
+    			if (routing[from_id].top > routing[to_id].top)
+    			{
+    				drawRect(routing[to_id].left, routing[to_id].top, routing[to_id].left + 2, routing[from_id].top + 2, input_colors[from_id]);
+    			}
+    			else
+    			{
+    				drawRect(routing[to_id].left, routing[from_id].top, routing[to_id].left + 2, routing[to_id].top + 2, input_colors[from_id]);
+    			}
+    			// TODO Color endpoint
     		}
     	}
-		
-		if (ff_inputs[0] >= 0)
-		{
-			drawRect(141, 120, 143, 122, input_colors[ff_inputs[0]]);
-			drawRect(144, 120, 148, 122, input_colors[ff_inputs[0]]);
-	    	drawRect(145, 119, 147, 123, input_colors[ff_inputs[0]]);
-	    	if (ff_inputs[0] <= 5)
-	    	{
-	    		drawRect(19, 116 + (8 * ff_inputs[0]), 141, 118 + (8 * ff_inputs[0]), input_colors[ff_inputs[0]]);
-	    		if (116 + (8 * ff_inputs[0]) > 120)
-	    		{
-	    	    	drawRect(139, 120, 141, 118 + (8 * ff_inputs[0]), input_colors[ff_inputs[0]]);
-	    		}
-	    		else
-	    		{
-	    	    	drawRect(139, 116 + (8 * ff_inputs[0]), 141, 122, input_colors[ff_inputs[0]]);
-	    		}
-	    	}
-	    	else
-	    	{
-	    		drawRect(125, 51 + (8 * (ff_inputs[0] - 13)), 139, 53 + (8 * (ff_inputs[0] - 13)), input_colors[ff_inputs[0]]);
-	    		drawRect(139, 51 + (8 * (ff_inputs[0] - 13)), 141, 122, input_colors[ff_inputs[0]]);
-	    	}
-		}
-		
-		if (ff_inputs[1] >= 0)
-		{
-			drawRect(137, 128, 143, 130, input_colors[ff_inputs[1]]);
-			drawRect(144, 128, 148, 130, input_colors[ff_inputs[1]]);
-	    	drawRect(145, 127, 147, 131, input_colors[ff_inputs[1]]);
-	    	if (ff_inputs[1] <= 5)
-	    	{
-	    		drawRect(19, 116 + (8 * ff_inputs[1]), 135, 118 + (8 * ff_inputs[1]), input_colors[ff_inputs[1]]);
-	    		if (116 + (8 * ff_inputs[1]) > 128)
-	    		{
-	    	    	drawRect(135, 128, 137, 118 + (8 * ff_inputs[1]), input_colors[ff_inputs[1]]);
-	    		}
-	    		else
-	    		{
-	    	    	drawRect(135, 116 + (8 * ff_inputs[1]), 137, 130, input_colors[ff_inputs[1]]);
-	    		}
-	    	}
-	    	else
-	    	{
-	    		drawRect(125, 51 + (8 * (ff_inputs[1] - 13)), 135, 53 + (8 * (ff_inputs[1] - 13)), input_colors[ff_inputs[1]]);
-	    		drawRect(135, 51 + (8 * (ff_inputs[1] - 13)), 137, 130, input_colors[ff_inputs[1]]);
-	    	}
-		}
-		
-		if (ff_inputs[2] >= 0)
-		{
-			drawRect(133, 153, 143, 155, input_colors[ff_inputs[2]]);
-			drawRect(144, 153, 148, 155, input_colors[ff_inputs[2]]);
-	    	drawRect(145, 152, 147, 156, input_colors[ff_inputs[2]]);
-	    	if (ff_inputs[2] <= 5)
-	    	{
-	    		drawRect(19, 116 + (8 * ff_inputs[2]), 131, 118 + (8 * ff_inputs[2]), input_colors[ff_inputs[2]]);
-	    		if (116 + (8 * ff_inputs[2]) > 153)
-	    		{
-	    	    	drawRect(131, 153, 133, 118 + (8 * ff_inputs[2]), input_colors[ff_inputs[2]]);
-	    		}
-	    		else
-	    		{
-	    	    	drawRect(131, 116 + (8 * ff_inputs[2]), 133, 155, input_colors[ff_inputs[2]]);
-	    		}
-	    	}
-	    	else
-	    	{
-	    		drawRect(125, 51 + (8 * (ff_inputs[2] - 13)), 131, 53 + (8 * (ff_inputs[2] - 13)), input_colors[ff_inputs[2]]);
-	    		drawRect(131, 51 + (8 * (ff_inputs[2] - 13)), 133, 155, input_colors[ff_inputs[2]]);
-	    	}
-		}
-		
-		if (ff_inputs[3] >= 0)
-		{
-			drawRect(129, 161, 143, 163, input_colors[ff_inputs[3]]);
-			drawRect(144, 161, 148, 163, input_colors[ff_inputs[3]]);
-	    	drawRect(145, 160, 147, 164, input_colors[ff_inputs[3]]);
-	    	if (ff_inputs[3] <= 5)
-	    	{
-	    		drawRect(19, 116 + (8 * ff_inputs[3]), 127, 118 + (8 * ff_inputs[3]), input_colors[ff_inputs[3]]);
-	    		if (116 + (8 * ff_inputs[3]) > 161)
-	    		{
-	    	    	drawRect(127, 161, 129, 118 + (8 * ff_inputs[3]), input_colors[ff_inputs[3]]);
-	    		}
-	    		else
-	    		{
-	    	    	drawRect(127, 116 + (8 * ff_inputs[3]), 129, 163, input_colors[ff_inputs[3]]);
-	    		}
-	    	}
-	    	else
-	    	{
-	    		drawRect(125, 51 + (8 * (ff_inputs[3] - 13)), 127, 53 + (8 * (ff_inputs[3] - 13)), input_colors[ff_inputs[3]]);
-	    		drawRect(127, 51 + (8 * (ff_inputs[3] - 13)), 129, 163, input_colors[ff_inputs[3]]);
-	    	}
-		}
-		
-		if (outputs[0] >= 0)
-		{
-			drawRect(194, 28, 216, 30, input_colors[outputs[0]]);
-	    	if (outputs[0] <= 14)
-	    	{
-	    		drawRect(125, 51 + (8 * (outputs[0] - 13)), 192, 53 + (8 * (outputs[0] - 13)), input_colors[outputs[0]]);
-	    		if (51 + (8 * (outputs[0] - 13)) > 28)
-	    		{
-	    	    	drawRect(192, 28, 194, 53 + (8 *(outputs[0] - 13)), input_colors[outputs[0]]);
-	    		}
-	    		else
-	    		{
-	    	    	drawRect(192, 51 + (8 * (outputs[0] - 13)), 194, 30, input_colors[outputs[0]]);
-	    		}
-	    	}
-	    	else
-	    	{
-	    		drawRect(190, 120 + (8 * (outputs[0] - 15)), 192, 122 + (8 * (outputs[0] - 15)), input_colors[outputs[0]]);
-	    		drawRect(192, 28, 194, 122 + (8 *(outputs[0] - 15)), input_colors[outputs[0]]);
-	    	}
-		}
-		
-		if (outputs[1] >= 0)
-		{
-			drawRect(198, 36, 216, 38, input_colors[outputs[1]]);
-		}
-		
-		if (outputs[2] >= 0)
-		{
-			drawRect(202, 44, 216, 46, input_colors[outputs[2]]);
-		}
-		
-		if (outputs[3] >= 0)
-		{
-			drawRect(206, 52, 216, 54, input_colors[outputs[3]]);
-		}
-		
-		if (outputs[4] >= 0)
-		{
-			drawRect(210, 60, 216, 62, input_colors[outputs[4]]);
-		}
-		
-		if (outputs[5] >= 0)
-		{
-			drawRect(214, 68, 216, 70, input_colors[outputs[5]]);
-		}
 	}
 	
 	@Override
