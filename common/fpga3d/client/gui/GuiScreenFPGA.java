@@ -21,9 +21,7 @@ public class GuiScreenFPGA extends GuiContainer
     					  -3111783, -12566464, -6643295, -13734263, -8503883, -13748083,
     					  -11587041, -13285861, -6933456, -15133162};
     
-    final static int LUT1 = 21;
-    final static int LUT2 = 25;
-    final static int LUT3 = 28;
+    int[][] lut_routing = {{21, 47}, {25, 55}, {29, 63}};
     
 	public GuiScreenFPGA()
 	{
@@ -291,32 +289,17 @@ public class GuiScreenFPGA extends GuiContainer
     	fontRenderer.drawString("Q", 172, 150, 4210752);
     	fontRenderer.drawString("Q'", 172, 160, 4210752);
     	
-		if (lut_inputs[0] >= 0)
-		{
-	    	drawRect(21, 47, 23, 118 + (8 * lut_inputs[0]), input_colors[lut_inputs[0]]);
-	    	drawRect(23, 47, 36, 49, input_colors[lut_inputs[0]]);
-	    	drawRect(19, 116 + (8 * lut_inputs[0]), 21, 118 + (8 * lut_inputs[0]), input_colors[lut_inputs[0]]);
-	    	drawRect(37, 47, 41, 49, input_colors[lut_inputs[0]]);
-	    	drawRect(38, 46, 40, 50, input_colors[lut_inputs[0]]);
-		}
-		
-		if (lut_inputs[1] >= 0)
-		{
-	    	drawRect(25, 55, 27, 118 + (8 * lut_inputs[1]), input_colors[lut_inputs[1]]);
-	    	drawRect(25, 55, 36, 57, input_colors[lut_inputs[1]]);
-	    	drawRect(19, 116 + (8 * lut_inputs[1]), 25, 118 + (8 * lut_inputs[1]), input_colors[lut_inputs[1]]);
-	    	drawRect(37, 55, 41, 57, input_colors[lut_inputs[1]]);
-	    	drawRect(38, 54, 40, 58, input_colors[lut_inputs[1]]);
-		}
-		
-		if (lut_inputs[2] >= 0)
-		{
-	    	drawRect(29, 63, 31, 118 + (8 * lut_inputs[2]), input_colors[lut_inputs[2]]);
-	    	drawRect(29, 63, 36, 65, input_colors[lut_inputs[2]]);
-	    	drawRect(19, 116 + (8 * lut_inputs[2]), 29, 118 + (8 * lut_inputs[2]), input_colors[lut_inputs[2]]);
-	    	drawRect(37, 63, 41, 65, input_colors[lut_inputs[2]]);
-	    	drawRect(38, 62, 40, 66, input_colors[lut_inputs[2]]);
-		}
+    	for (int lut = 0; lut < 3; ++lut)
+    	{
+    		if (lut_inputs[lut] >= 0)
+    		{
+	    		drawRect(lut_routing[lut][0], lut_routing[lut][1], lut_routing[lut][0] + 2, 118 + (8 * lut_inputs[lut]), input_colors[lut_inputs[lut]]);
+		    	drawRect(lut_routing[lut][0] + 2, lut_routing[lut][1], 36, lut_routing[lut][1] + 2, input_colors[lut_inputs[lut]]);
+		    	drawRect(19, 116 + (8 * lut_inputs[lut]), lut_routing[lut][0], 118 + (8 * lut_inputs[lut]), input_colors[lut_inputs[lut]]);
+		    	drawRect(37, lut_routing[lut][1], 41, lut_routing[lut][1] + 2, input_colors[lut_inputs[lut]]);
+		    	drawRect(38, lut_routing[lut][1] - 1, 40, lut_routing[lut][1] + 3, input_colors[lut_inputs[lut]]);
+    		}
+    	}
 		
 		if (ff_inputs[0] >= 0)
 		{
@@ -334,6 +317,11 @@ public class GuiScreenFPGA extends GuiContainer
 	    		{
 	    	    	drawRect(139, 116 + (8 * ff_inputs[0]), 141, 122, input_colors[ff_inputs[0]]);
 	    		}
+	    	}
+	    	else
+	    	{
+	    		drawRect(125, 51 + (8 * (ff_inputs[0] - 13)), 139, 53 + (8 * (ff_inputs[0] - 13)), input_colors[ff_inputs[0]]);
+	    		drawRect(139, 51 + (8 * (ff_inputs[0] - 13)), 141, 122, input_colors[ff_inputs[0]]);
 	    	}
 		}
 		
@@ -354,6 +342,11 @@ public class GuiScreenFPGA extends GuiContainer
 	    	    	drawRect(135, 116 + (8 * ff_inputs[1]), 137, 130, input_colors[ff_inputs[1]]);
 	    		}
 	    	}
+	    	else
+	    	{
+	    		drawRect(125, 51 + (8 * (ff_inputs[1] - 13)), 135, 53 + (8 * (ff_inputs[1] - 13)), input_colors[ff_inputs[1]]);
+	    		drawRect(135, 51 + (8 * (ff_inputs[1] - 13)), 137, 130, input_colors[ff_inputs[1]]);
+	    	}
 		}
 		
 		if (ff_inputs[2] >= 0)
@@ -372,6 +365,11 @@ public class GuiScreenFPGA extends GuiContainer
 	    		{
 	    	    	drawRect(131, 116 + (8 * ff_inputs[2]), 133, 155, input_colors[ff_inputs[2]]);
 	    		}
+	    	}
+	    	else
+	    	{
+	    		drawRect(125, 51 + (8 * (ff_inputs[2] - 13)), 131, 53 + (8 * (ff_inputs[2] - 13)), input_colors[ff_inputs[2]]);
+	    		drawRect(131, 51 + (8 * (ff_inputs[2] - 13)), 133, 155, input_colors[ff_inputs[2]]);
 	    	}
 		}
 		
@@ -392,11 +390,33 @@ public class GuiScreenFPGA extends GuiContainer
 	    	    	drawRect(127, 116 + (8 * ff_inputs[3]), 129, 163, input_colors[ff_inputs[3]]);
 	    		}
 	    	}
+	    	else
+	    	{
+	    		drawRect(125, 51 + (8 * (ff_inputs[3] - 13)), 127, 53 + (8 * (ff_inputs[3] - 13)), input_colors[ff_inputs[3]]);
+	    		drawRect(127, 51 + (8 * (ff_inputs[3] - 13)), 129, 163, input_colors[ff_inputs[3]]);
+	    	}
 		}
 		
 		if (outputs[0] >= 0)
 		{
 			drawRect(194, 28, 216, 30, input_colors[outputs[0]]);
+	    	if (outputs[0] <= 14)
+	    	{
+	    		drawRect(125, 51 + (8 * (outputs[0] - 13)), 192, 53 + (8 * (outputs[0] - 13)), input_colors[outputs[0]]);
+	    		if (51 + (8 * (outputs[0] - 13)) > 28)
+	    		{
+	    	    	drawRect(192, 28, 194, 53 + (8 *(outputs[0] - 13)), input_colors[outputs[0]]);
+	    		}
+	    		else
+	    		{
+	    	    	drawRect(192, 51 + (8 * (outputs[0] - 13)), 194, 30, input_colors[outputs[0]]);
+	    		}
+	    	}
+	    	else
+	    	{
+	    		drawRect(190, 120 + (8 * (outputs[0] - 15)), 192, 122 + (8 * (outputs[0] - 15)), input_colors[outputs[0]]);
+	    		drawRect(192, 28, 194, 122 + (8 *(outputs[0] - 15)), input_colors[outputs[0]]);
+	    	}
 		}
 		
 		if (outputs[1] >= 0)
