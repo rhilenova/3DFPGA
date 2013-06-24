@@ -31,9 +31,9 @@ public class CommonProxy implements IGuiHandler
 	{
 		if (ID == Reference.GuiIDs.FPGA)
 		{
-            return new GuiScreenFPGA();
+			TileEntityFPGA tile = (TileEntityFPGA) world.getBlockTileEntity(x, y, z);
+            return new GuiScreenFPGA(tile);
 		}
 		return null;
 	}
-
 }

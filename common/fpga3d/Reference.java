@@ -1,6 +1,9 @@
 package fpga3d;
 
-public class Reference {
+public class Reference
+{
+	public static final String MOD_CHANNEL = "FPGA3D";
+	
 	public static final String MOD_ID = "FPGA3D";
 	public static final String MOD_NAME = "FPGA3D";
 	public static final String VERSION_NUMBER = "0.1";
@@ -28,5 +31,10 @@ public class Reference {
         public static final String GUI_SHEET_LOCATION = "/mods/fpga3d/textures/gui/";
         
     	public static final String GUI_FPGA = GUI_SHEET_LOCATION + "fpga.png";
+    }
+    
+    public static final class MessageIDs
+    {
+    	public static final int FPGA = 0;
     }
 }

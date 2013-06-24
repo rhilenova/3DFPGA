@@ -14,9 +14,10 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import fpga3d.core.proxy.CommonProxy;
+import fpga3d.network.PacketHandler;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION_NUMBER)
-@NetworkMod(clientSideRequired=true, serverSideRequired=false)
+@NetworkMod(channels = {Reference.MOD_CHANNEL}, clientSideRequired=true, serverSideRequired=false, packetHandler = PacketHandler.class)
 public class FPGA3D {
 	
     @Instance(Reference.MOD_ID)

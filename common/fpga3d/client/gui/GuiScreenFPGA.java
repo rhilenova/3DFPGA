@@ -4,12 +4,12 @@ import java.util.Arrays;
 
 import fpga3d.Reference;
 import fpga3d.inventory.ContainerFPGA;
+import fpga3d.tileentity.TileEntityFPGA;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 
 public class GuiScreenFPGA extends GuiContainer
 {
-	//----------NEW----------
     class routing_struct
     {
     	routing_struct(int _l, int _t, int _r)
@@ -58,11 +58,9 @@ public class GuiScreenFPGA extends GuiContainer
 		new routing_struct(212, 71, 216)
 	};
 
-    int[] connections = new int[13];
     int[] array_idx = {6, 7, 8, 9, 10, 11, 12, 19, 20, 21, 22, 23, 24};
     
-    //----------OLD----------
-    int[] number_vals = {0, 0, 0, 0, 0, 0, 0, 0};
+    int[] number_vals = new int[8];
     int num_endpoints;
     int num_numbers;
     
@@ -73,11 +71,15 @@ public class GuiScreenFPGA extends GuiContainer
     					  -3111783, -12566464, -6643295, -13734263, -8503883, -13748083,
     					  -11587041, -13285861, -6933456, -15133162};
     
-    int[][] lut_routing = {{21, 47}, {25, 55}, {29, 63}};
+    TileEntityFPGA tile;
     
-	public GuiScreenFPGA()
+    /**
+     * Create the GUI.
+     */
+	public GuiScreenFPGA(TileEntityFPGA tile)
 	{
 		super(new ContainerFPGA());
+		this.tile = tile;
 		this.xSize = 235;
 		this.ySize = 186;
 		last_endpoint = -1;
@@ -85,6 +87,7 @@ public class GuiScreenFPGA extends GuiContainer
 	
 	/**
      * Adds the buttons (and other controls) to the screen in question.
+     * TODO cleanup?
      */
     @SuppressWarnings("unchecked")
 	public void initGui()
@@ -131,9 +134,6 @@ public class GuiScreenFPGA extends GuiContainer
         	temp.drawButton = false;
         	buttonList.add(temp);
         }
-        
-        //----------NEW----------
-        Arrays.fill(connections, -1);
     }
     
     /**
@@ -142,6 +142,7 @@ public class GuiScreenFPGA extends GuiContainer
     protected void actionPerformed(GuiButton par1GuiButton)
     {
     	int ID = par1GuiButton.id;
+    	// Handle routing control
     	if (ID >= 0 && ID < num_endpoints)
     	{
     		if (last_endpoint == -1)
@@ -157,9 +158,9 @@ public class GuiScreenFPGA extends GuiContainer
     				if (ID == last_endpoint)
     				{
     					last_endpoint = -1;
-    					for (int x = 0; x < connections.length; ++x)
+    					for (int x = 0; x < tile.connections.length; ++x)
     					{
-    						if (connections[x] == ID) connections[x] = -1;
+    						if (tile.connections[x] == ID) tile.connections[x] = -1;
     					}
     				}
     				// New first click
@@ -172,7 +173,7 @@ public class GuiScreenFPGA extends GuiContainer
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
     					int idx = Arrays.binarySearch(array_idx, ID);
-    					connections[idx] = last_endpoint;
+    					tile.connections[idx] = last_endpoint;
     					last_endpoint = -1;
     				}
     			}
@@ -183,7 +184,7 @@ public class GuiScreenFPGA extends GuiContainer
     				if (ID == last_endpoint)
     				{
     					int idx = Arrays.binarySearch(array_idx, ID);
-    					connections[idx] = -1;
+    					tile.connections[idx] = -1;
     					last_endpoint = -1;
     				}
     				// New first click
@@ -196,7 +197,7 @@ public class GuiScreenFPGA extends GuiContainer
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
     					int idx = Arrays.binarySearch(array_idx, last_endpoint);
-    					connections[idx] = ID;
+    					tile.connections[idx] = ID;
     					last_endpoint = -1;
     				}
     			}
@@ -207,7 +208,7 @@ public class GuiScreenFPGA extends GuiContainer
     				if (ID == last_endpoint)
     				{
     					int idx = Arrays.binarySearch(array_idx, ID);
-    					connections[idx] = -1;
+    					tile.connections[idx] = -1;
     					last_endpoint = -1;
     				}
     				// New first click
@@ -220,7 +221,7 @@ public class GuiScreenFPGA extends GuiContainer
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
     					int idx = Arrays.binarySearch(array_idx, last_endpoint);
-    					connections[idx] = ID;
+    					tile.connections[idx] = ID;
     					last_endpoint = -1;
     				}
     			}
@@ -231,9 +232,9 @@ public class GuiScreenFPGA extends GuiContainer
     				if (ID == last_endpoint)
     				{
     					last_endpoint = -1;
-    					for (int x = 0; x < connections.length; ++x)
+    					for (int x = 0; x < tile.connections.length; ++x)
     					{
-    						if (connections[x] == ID) connections[x] = -1;
+    						if (tile.connections[x] == ID) tile.connections[x] = -1;
     					}
     				}
     				// New first click
@@ -246,7 +247,7 @@ public class GuiScreenFPGA extends GuiContainer
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
     					int idx = Arrays.binarySearch(array_idx, ID);
-    					connections[idx] = last_endpoint;
+    					tile.connections[idx] = last_endpoint;
     					last_endpoint = -1;
     				}
     			}
@@ -257,9 +258,9 @@ public class GuiScreenFPGA extends GuiContainer
     				if (ID == last_endpoint)
     				{
     					last_endpoint = -1;
-    					for (int x = 0; x < connections.length; ++x)
+    					for (int x = 0; x < tile.connections.length; ++x)
     					{
-    						if (connections[x] == ID) connections[x] = -1;
+    						if (tile.connections[x] == ID) tile.connections[x] = -1;
     					}
     				}
     				// New first click
@@ -272,7 +273,7 @@ public class GuiScreenFPGA extends GuiContainer
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
     					int idx = Arrays.binarySearch(array_idx, ID);
-    					connections[idx] = last_endpoint;
+    					tile.connections[idx] = last_endpoint;
     					last_endpoint = -1;
     				}
     			}
@@ -283,7 +284,7 @@ public class GuiScreenFPGA extends GuiContainer
     				if (ID == last_endpoint)
     				{
     					int idx = Arrays.binarySearch(array_idx, ID);
-    					connections[idx] = -1;
+    					tile.connections[idx] = -1;
     					last_endpoint = -1;
     				}
     				// New first click
@@ -296,12 +297,13 @@ public class GuiScreenFPGA extends GuiContainer
     				{
     					System.out.println("Connected " + last_endpoint + " to " + ID);
     					int idx = Arrays.binarySearch(array_idx, last_endpoint);
-    					connections[idx] = ID;
+    					tile.connections[idx] = ID;
     					last_endpoint = -1;
     				}
     			}
     		}
     	}
+    	// Handle LUT control
     	else if (ID >= num_endpoints && ID < num_endpoints + num_numbers)
     	{
         	int number_id = (ID - num_endpoints) / 2;
@@ -313,6 +315,7 @@ public class GuiScreenFPGA extends GuiContainer
 	@Override
     protected void drawGuiContainerForegroundLayer(int x, int y)
 	{
+		// Draw LUT static text
     	fontRenderer.drawString("LUT", 72, 10, 4210752);
     	fontRenderer.drawString("000", 50, 24, 4210752);
     	fontRenderer.drawString("001", 50, 34, 4210752);
@@ -323,11 +326,13 @@ public class GuiScreenFPGA extends GuiContainer
     	fontRenderer.drawString("110", 50, 84, 4210752);
     	fontRenderer.drawString("111", 50, 94, 4210752);
     	
+		// Draw LUT numbers
     	for (int idx = 0; idx < 8; ++idx)
     	{
         	fontRenderer.drawString(String.format("%02X", number_vals[idx]), 100, 24 + (10 * idx), 4210752);
     	}
     	
+    	// Draw FF static text
     	fontRenderer.drawString("D", 152, 117, 4210752);
     	fontRenderer.drawString("Clk", 152, 127, 4210752);
     	fontRenderer.drawString("Q", 172, 117, 4210752);
@@ -338,9 +343,10 @@ public class GuiScreenFPGA extends GuiContainer
     	fontRenderer.drawString("Q", 172, 150, 4210752);
     	fontRenderer.drawString("Q'", 172, 160, 4210752);
 
-    	for (int connection = 0; connection < connections.length; ++connection)
+    	// Draw routing
+    	for (int connection = 0; connection < tile.connections.length; ++connection)
     	{
-    		int from_id = connections[connection];
+    		int from_id = tile.connections[connection];
     		int to_id = array_idx[connection];
     		if (from_id >= 0)
     		{
@@ -357,11 +363,27 @@ public class GuiScreenFPGA extends GuiContainer
     			{
     				drawRect(routing[to_id].left, routing[from_id].top, routing[to_id].left + 2, routing[to_id].top + 2, input_colors[from_id]);
     			}
-    			// TODO Color endpoint
+    			// Color endpoint
+    			if (to_id <= 18)
+    			{
+					drawRect(routing[to_id].right + 1, routing[to_id].top, routing[to_id].right + 5, routing[to_id].top + 2, input_colors[from_id]);
+					drawRect(routing[to_id].right + 2, routing[to_id].top - 1, routing[to_id].right + 4, routing[to_id].top + 3, input_colors[from_id]);
+    			}
     		}
     	}
 	}
 	
+	/**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
+	@Override
+    public void onGuiClosed()
+    {
+		// TODO send packet with connection info
+    	super.onGuiClosed();
+    }
+	
+	// Draw background image
 	@Override
     protected void drawGuiContainerBackgroundLayer(float opacity, int x, int y)
 	{
