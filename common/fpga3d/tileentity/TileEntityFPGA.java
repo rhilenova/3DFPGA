@@ -34,6 +34,7 @@ public class TileEntityFPGA extends TileEntity {
 		try
 		{
 		    dos.writeInt(Reference.MessageIDs.FPGA);
+		    dos.writeInt(worldObj.getWorldInfo().getDimension());
 		    
 			dos.writeInt(xCoord);
 			dos.writeInt(yCoord);
@@ -64,9 +65,13 @@ public class TileEntityFPGA extends TileEntity {
     public void writeToNBT(NBTTagCompound nbtTagCompound)
     {
     	super.writeToNBT(nbtTagCompound);
-    	for (int x = 0; x < connections.length; ++x)
-    	{
-    		System.out.println("\t" + connections[x]);
-    	}
+    	nbtTagCompound.setIntArray("connections", connections);
+    }
+    
+    @Override
+    public void readFromNBT(NBTTagCompound nbtTagCompound)
+	{
+    	super.readFromNBT(nbtTagCompound);
+    	connections = nbtTagCompound.getIntArray("connections");
     }
 }

@@ -2,6 +2,8 @@ package fpga3d.client.gui;
 
 import java.util.Arrays;
 
+import cpw.mods.fml.common.network.PacketDispatcher;
+
 import fpga3d.Reference;
 import fpga3d.inventory.ContainerFPGA;
 import fpga3d.tileentity.TileEntityFPGA;
@@ -302,6 +304,12 @@ public class GuiScreenFPGA extends GuiContainer
     				}
     			}
     		}
+
+    		if (last_endpoint == -1)
+    		{
+	        	System.out.println("Sending packet");
+	        	PacketDispatcher.sendPacketToServer(tile.getDescriptionPacket());
+    		}
     	}
     	// Handle LUT control
     	else if (ID >= num_endpoints && ID < num_endpoints + num_numbers)
@@ -372,16 +380,6 @@ public class GuiScreenFPGA extends GuiContainer
     		}
     	}
 	}
-	
-	/**
-     * Called when the screen is unloaded. Used to disable keyboard repeat events
-     */
-	@Override
-    public void onGuiClosed()
-    {
-		// TODO send packet with connection info
-    	super.onGuiClosed();
-    }
 	
 	// Draw background image
 	@Override

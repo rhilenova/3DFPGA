@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
 import fpga3d.FPGA3D;
@@ -17,6 +18,7 @@ public class PacketHandler implements IPacketHandler
     {
 		try
         {
+			int dim = dis.readInt();
 			int x = dis.readInt();
 			int y = dis.readInt();
 			int z = dis.readInt();
@@ -27,7 +29,7 @@ public class PacketHandler implements IPacketHandler
 			{
 				connections[conn] = dis.readInt();
 			}
-			//FPGA3D.proxy.handleTileEntityPacket(x, y, z, connections);
+			FPGA3D.proxy.handleTileEntityPacket(x, y, z, dim, connections);
         }
         catch (IOException e)
         {
@@ -40,7 +42,7 @@ public class PacketHandler implements IPacketHandler
 	{
 		if (packet.channel == Reference.MOD_CHANNEL)
 		{
-			System.out.println("Got packet");
+			System.out.println("Got packet: " + FMLCommonHandler.instance().getEffectiveSide());
 			ByteArrayInputStream bis = new ByteArrayInputStream(packet.data);
 			DataInputStream dis = new DataInputStream(bis);
 
