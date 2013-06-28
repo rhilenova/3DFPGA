@@ -36,6 +36,4 @@ public class CommonProxy implements IGuiHandler
 		}
 		return null;
 	}
-	
-	public void handleTileEntityPacket(int x, int y, int z, int dim, int[] connections)	{}
 }

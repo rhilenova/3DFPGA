@@ -17,7 +17,7 @@ import fpga3d.core.proxy.CommonProxy;
 import fpga3d.network.PacketHandler;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION_NUMBER)
-@NetworkMod(channels = {Reference.MOD_CHANNEL}, clientSideRequired=true, serverSideRequired=false, packetHandler = PacketHandler.class)
+@NetworkMod(channels = {Reference.MOD_CHANNEL}, clientSideRequired=true, serverSideRequired=true, packetHandler = PacketHandler.class)
 public class FPGA3D {
 	
     @Instance(Reference.MOD_ID)

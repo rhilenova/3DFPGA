@@ -23,6 +23,7 @@ public class TileEntityFPGA extends TileEntity {
     public void setConnections(int[] connections)
     {
     	this.connections = connections;
+		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
     }
     
     @Override
