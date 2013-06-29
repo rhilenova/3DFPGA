@@ -1,5 +1,7 @@
 package fpga3d;
 
+import net.minecraft.creativetab.CreativeTabs;
+
 import fpga3d.block.ModBlocks;
 
 import cpw.mods.fml.common.Mod;
@@ -13,7 +15,9 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 import fpga3d.core.proxy.CommonProxy;
+import fpga3d.creativetab.CreativeTabFPGA;
 import fpga3d.network.PacketHandler;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION_NUMBER)
@@ -26,11 +30,22 @@ public class FPGA3D {
 	@SidedProxy(clientSide = Reference.CLIENT_PROXY_CLASS, serverSide = Reference.SERVER_PROXY_CLASS)
 	public static CommonProxy proxy;
 	
+	public static CreativeTabs tabsFPGA = new CreativeTabFPGA(CreativeTabs.getNextID(), Reference.MOD_ID);
+	
+	private static String[] localeFiles = {"/mods/fpga3d/lang/en_US.xml"};
+	
 	@PreInit
 	public void preInit(FMLPreInitializationEvent event)
 	{        
 		// Initialize mod blocks
         ModBlocks.init();
+        
+        // For every file specified in the Localization library class, load them into the Language Registry
+        for (String localizationFile : localeFiles)
+        {
+        	String locale = localizationFile.substring(localizationFile.lastIndexOf('/') + 1, localizationFile.lastIndexOf('.'));
+            LanguageRegistry.instance().loadLocalization(localizationFile, locale, true);
+        }
 	}
 	
 	@Init

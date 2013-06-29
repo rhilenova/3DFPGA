@@ -14,15 +14,17 @@ import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityFPGA extends TileEntity {
     public int[] connections = new int[13];
+    public int[] lut_vals = new int[8];
     
     public TileEntityFPGA()
     {
         Arrays.fill(connections, -1);
     }
     
-    public void setConnections(int[] connections)
+    public void setUpdate(int[] connections, int[] lut_vals)
     {
     	this.connections = connections;
+    	this.lut_vals = lut_vals;
 		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
     }
     
@@ -44,6 +46,10 @@ public class TileEntityFPGA extends TileEntity {
 			for (int x = 0; x < connections.length; ++x)
 	    	{
 	    		dos.writeInt(connections[x]);
+	    	}
+			for (int x = 0; x < lut_vals.length; ++x)
+	    	{
+	    		dos.writeInt(lut_vals[x]);
 	    	}
 		}
 		catch (IOException e)
@@ -67,6 +73,7 @@ public class TileEntityFPGA extends TileEntity {
     {
     	super.writeToNBT(nbtTagCompound);
     	nbtTagCompound.setIntArray("connections", connections);
+    	nbtTagCompound.setIntArray("lut_vals", lut_vals);
     }
     
     @Override
@@ -74,5 +81,6 @@ public class TileEntityFPGA extends TileEntity {
 	{
     	super.readFromNBT(nbtTagCompound);
     	connections = nbtTagCompound.getIntArray("connections");
+    	lut_vals = nbtTagCompound.getIntArray("lut_vals");
     }
 }

@@ -61,8 +61,7 @@ public class GuiScreenFPGA extends GuiContainer
 	};
 
     int[] array_idx = {6, 7, 8, 9, 10, 11, 12, 19, 20, 21, 22, 23, 24};
-    
-    int[] number_vals = new int[8];
+
     int num_endpoints;
     int num_numbers;
     
@@ -307,7 +306,6 @@ public class GuiScreenFPGA extends GuiContainer
 
     		if (last_endpoint == -1)
     		{
-	        	System.out.println("Sending packet");
 	        	PacketDispatcher.sendPacketToServer(tile.getDescriptionPacket());
     		}
     	}
@@ -316,7 +314,8 @@ public class GuiScreenFPGA extends GuiContainer
     	{
         	int number_id = (ID - num_endpoints) / 2;
         	int number_mod = (ID - num_endpoints) % 2;
-        	number_vals[number_id] = number_vals[number_id] ^ (0x10 >> (4 * number_mod));
+        	tile.lut_vals[number_id] = tile.lut_vals[number_id] ^ (0x10 >> (4 * number_mod));
+        	PacketDispatcher.sendPacketToServer(tile.getDescriptionPacket());
     	}
     }
 
@@ -337,7 +336,7 @@ public class GuiScreenFPGA extends GuiContainer
 		// Draw LUT numbers
     	for (int idx = 0; idx < 8; ++idx)
     	{
-        	fontRenderer.drawString(String.format("%02X", number_vals[idx]), 100, 24 + (10 * idx), 4210752);
+        	fontRenderer.drawString(String.format("%02X", tile.lut_vals[idx]), 100, 24 + (10 * idx), 4210752);
     	}
     	
     	// Draw FF static text

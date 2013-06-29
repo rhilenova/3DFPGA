@@ -19,7 +19,6 @@ public class PacketHandler implements IPacketHandler
 {
 	public void onPacketData(INetworkManager manager, Packet250CustomPayload packet, Player player)
 	{
-		System.out.println("Got " + FMLCommonHandler.instance().getEffectiveSide() + " packet for " + packet.channel);
 		if (packet.channel.equals(Reference.MOD_CHANNEL))
 		{
 			ByteArrayInputStream bis = new ByteArrayInputStream(packet.data);
@@ -39,13 +38,18 @@ public class PacketHandler implements IPacketHandler
 	
 	public static void handleFPGAMessage(DataInputStream dis, int x, int y, int z, int dim)
 	{
-		// TODO hard coded 13
+		// TODO hard coded lengths
 		int[] connections = new int[13];
+		int[] lut_vals = new int[8];
 		try
 		{
-			for (int conn = 0; conn < 13; ++conn)
+			for (int conn = 0; conn < connections.length; ++conn)
 			{
 				connections[conn] = dis.readInt();
+			}
+			for (int lut = 0; lut < lut_vals.length; ++lut)
+			{
+				lut_vals[lut] = dis.readInt();
 			}
 		}
         catch (IOException e)
@@ -57,7 +61,6 @@ public class PacketHandler implements IPacketHandler
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
 		{
 			tile = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(dim).getBlockTileEntity(x, y, z);
-			System.out.println("Got Server FPGA: " + tile);
 		}
 		else
 		{
@@ -65,7 +68,6 @@ public class PacketHandler implements IPacketHandler
 			{
 				tile = FMLClientHandler.instance().getClient().theWorld.getBlockTileEntity(x, y, z);
 			}
-			System.out.println("Got Client FPGA: " + tile);
 		}
 		
 		if (tile == null || !(tile instanceof TileEntityFPGA)) {
@@ -73,7 +75,7 @@ public class PacketHandler implements IPacketHandler
 		}
 		
 		TileEntityFPGA tile_fpga = (TileEntityFPGA)tile;
-		tile_fpga.setConnections(connections);
+		tile_fpga.setUpdate(connections, lut_vals);
 	}
 	
 	public static void parseMessage(DataInputStream dis, int id)

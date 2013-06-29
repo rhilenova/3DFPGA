@@ -11,23 +11,41 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 
 public class BlockFPGA extends Block implements ITileEntityProvider
 {
-	@Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister iconRegister)
-	{
-        blockIcon = iconRegister.registerIcon(Reference.MOD_ID.toLowerCase() + ":" + this.getUnlocalizedName2());
-    }
+	@SideOnly(Side.CLIENT)
+    private Icon[] iconArray;
 	
 	public BlockFPGA(int par1)
 	{
 		super(par1, Material.rock);
         this.setUnlocalizedName(Reference.Strings.FPGA_NAME);
+        this.setCreativeTab(FPGA3D.tabsFPGA);
 	}
-
+	
+	@Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IconRegister iconRegister)
+	{
+        iconArray = new Icon[6];
+		for (int i = 0; i < this.iconArray.length; ++i)
+        {
+			iconArray[i] = iconRegister.registerIcon(Reference.MOD_ID.toLowerCase() + ":" + this.getUnlocalizedName2() + i);
+        }
+    }
+	
+    @SideOnly(Side.CLIENT)
+    /**
+     * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
+     */
+    public Icon getIcon(int par1, int par2)
+    {
+        return iconArray[par1];
+    }
+	
 	/**
      * Called upon block activation (right click on the block.)
      */
