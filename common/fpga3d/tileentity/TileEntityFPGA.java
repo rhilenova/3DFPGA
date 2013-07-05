@@ -5,82 +5,92 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import fpga3d.Reference;
-
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet250CustomPayload;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import fpga3d.Reference;
 
-public class TileEntityFPGA extends TileEntity {
-    public int[] connections = new int[13];
-    public int[] lut_vals = new int[8];
-    
+public class TileEntityFPGA extends TileEntity
+{
+    public int[] connections = new int[Reference.Constants.NUM_ENDPOINTS];
+    public int[] values = new int[Reference.Constants.NUM_ENDPOINTS];
+    public int[] ff_vals = new int[2]; // TODO reference
+    public int[] lut_vals = new int[Reference.Constants.LUT_SIZE];
+
     public TileEntityFPGA()
     {
-        Arrays.fill(connections, -1);
+        Arrays.fill(this.connections, -1);
+        Arrays.fill(this.values, -1);
     }
-    
-    public void setUpdate(int[] connections, int[] lut_vals)
+
+    public void setUpdate(int[] connections, int[] values, int[] lut_vals)
     {
-    	this.connections = connections;
-    	this.lut_vals = lut_vals;
-		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        this.connections = connections;
+        this.values = values;
+        this.lut_vals = lut_vals;
+        this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
     }
-    
+
     @Override
-	public Packet getDescriptionPacket()
-	{
-    	ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(bos);
+    public Packet getDescriptionPacket()
+    {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(bos);
 
-		try
-		{
-		    dos.writeInt(Reference.MessageIDs.FPGA);
-		    dos.writeInt(worldObj.getWorldInfo().getDimension());
-		    
-			dos.writeInt(xCoord);
-			dos.writeInt(yCoord);
-			dos.writeInt(zCoord);
-			
-			for (int x = 0; x < connections.length; ++x)
-	    	{
-	    		dos.writeInt(connections[x]);
-	    	}
-			for (int x = 0; x < lut_vals.length; ++x)
-	    	{
-	    		dos.writeInt(lut_vals[x]);
-	    	}
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		
-		byte[] data = bos.toByteArray();
+        try
+        {
+            dos.writeInt(Reference.MessageIDs.FPGA);
+            dos.writeInt(this.worldObj.getWorldInfo().getDimension());
 
-		Packet250CustomPayload packet = new Packet250CustomPayload();
-		packet.channel = Reference.MOD_CHANNEL;
-		packet.data = data;
-		packet.length = data.length;
-		packet.isChunkDataPacket = true;
+            dos.writeInt(this.xCoord);
+            dos.writeInt(this.yCoord);
+            dos.writeInt(this.zCoord);
 
-		return packet;
-	}
-    
+            for (int connection : this.connections)
+            {
+                dos.writeInt(connection);
+            }
+            for (int value : this.values)
+            {
+                dos.writeInt(value);
+            }
+            for (int val : this.lut_vals)
+            {
+                dos.writeInt(val);
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        byte[] data = bos.toByteArray();
+
+        Packet250CustomPayload packet = new Packet250CustomPayload();
+        packet.channel = Reference.MOD_CHANNEL;
+        packet.data = data;
+        packet.length = data.length;
+        packet.isChunkDataPacket = true;
+
+        return packet;
+    }
+
     @Override
     public void writeToNBT(NBTTagCompound nbtTagCompound)
     {
-    	super.writeToNBT(nbtTagCompound);
-    	nbtTagCompound.setIntArray("connections", connections);
-    	nbtTagCompound.setIntArray("lut_vals", lut_vals);
+        super.writeToNBT(nbtTagCompound);
+        nbtTagCompound.setIntArray("connections", this.connections);
+        nbtTagCompound.setIntArray("values", this.values);
+        nbtTagCompound.setIntArray("lut_vals", this.lut_vals);
     }
-    
+
     @Override
     public void readFromNBT(NBTTagCompound nbtTagCompound)
-	{
-    	super.readFromNBT(nbtTagCompound);
-    	connections = nbtTagCompound.getIntArray("connections");
-    	lut_vals = nbtTagCompound.getIntArray("lut_vals");
+    {
+        super.readFromNBT(nbtTagCompound);
+        this.connections = nbtTagCompound.getIntArray("connections");
+        this.values = nbtTagCompound.getIntArray("values");
+        this.lut_vals = nbtTagCompound.getIntArray("lut_vals");
     }
 }

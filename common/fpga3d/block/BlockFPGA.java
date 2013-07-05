@@ -1,10 +1,7 @@
 package fpga3d.block;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import fpga3d.FPGA3D;
-import fpga3d.Reference;
-import fpga3d.tileentity.TileEntityFPGA;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -12,44 +9,72 @@ import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import fpga3d.FPGA3D;
+import fpga3d.Reference;
+import fpga3d.tileentity.TileEntityFPGA;
 
 public class BlockFPGA extends Block implements ITileEntityProvider
 {
-	@SideOnly(Side.CLIENT)
+    @SideOnly(Side.CLIENT)
     private Icon[] iconArray;
-	
-	public BlockFPGA(int par1)
-	{
-		super(par1, Material.rock);
+
+    private int[] side_transformer = {1, 0, 3, 2, 5, 4};
+
+    public BlockFPGA(int par1)
+    {
+        super(par1, Material.rock);
         this.setUnlocalizedName(Reference.Strings.FPGA_NAME);
         this.setCreativeTab(FPGA3D.tabsFPGA);
-	}
-	
-	@Override
+    }
+
+    @Override
     @SideOnly(Side.CLIENT)
     public void registerIcons(IconRegister iconRegister)
-	{
-        iconArray = new Icon[6];
-		for (int i = 0; i < this.iconArray.length; ++i)
+    {
+        this.iconArray = new Icon[6];
+        for (int i = 0; i < this.iconArray.length; ++i)
         {
-			iconArray[i] = iconRegister.registerIcon(Reference.MOD_ID.toLowerCase() + ":" + this.getUnlocalizedName2() + i);
+            this.iconArray[i] = iconRegister.registerIcon(Reference.MOD_ID
+                    .toLowerCase() + ":" + this.getUnlocalizedName2() + i);
         }
     }
-	
-    @SideOnly(Side.CLIENT)
+
+    @Override
+    public boolean isBlockSolidOnSide(World world, int x, int y, int z,
+                                      ForgeDirection side)
+    {
+        return true;
+    }
+
     /**
-     * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
+     * From the specified side and block metadata retrieves the blocks texture.
+     * Args: side, metadata
      */
+    @Override
+    @SideOnly(Side.CLIENT)
     public Icon getIcon(int par1, int par2)
     {
-        return iconArray[par1];
+        return this.iconArray[par1];
     }
-	
-	/**
+
+    @Override
+    public boolean canProvidePower()
+    {
+        return true;
+    }
+
+    /**
      * Called upon block activation (right click on the block.)
      */
-    public boolean onBlockActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9)
+    @Override
+    public boolean onBlockActivated(World par1World, int x, int y, int z,
+                                    EntityPlayer par5EntityPlayer, int par6,
+                                    float par7, float par8, float par9)
     {
         if (par1World.isRemote)
         {
@@ -57,20 +82,169 @@ public class BlockFPGA extends Block implements ITileEntityProvider
         }
         else
         {
-            TileEntityFPGA tileentityfpga = (TileEntityFPGA) par1World.getBlockTileEntity(x, y, z);
+            TileEntityFPGA tileentityfpga = (TileEntityFPGA) par1World
+                    .getBlockTileEntity(x, y, z);
 
             if (tileentityfpga != null)
             {
-                par5EntityPlayer.openGui(FPGA3D.instance, Reference.GuiIDs.FPGA, par1World, x, y, z);
+                par5EntityPlayer.openGui(FPGA3D.instance,
+                                         Reference.GuiIDs.FPGA, par1World, x,
+                                         y, z);
             }
 
             return true;
         }
     }
 
-	@Override
-	public TileEntity createNewTileEntity(World world)
-	{
-		return new TileEntityFPGA();
-	}
+    /**
+     * Called whenever the block is added into the world. Args: world, x, y, z
+     */
+    @Override
+    public void onBlockAdded(World par1World, int x, int y, int z)
+    {
+        par1World.scheduleBlockUpdate(x, y, z, this.blockID,
+                                      this.tickRate(par1World));
+    }
+
+    /**
+     * Lets the block know when one of its neighbor changes. Doesn't know which
+     * neighbor changed (coordinates passed are their own) Args: x, y, z,
+     * neighbor blockID
+     */
+    @Override
+    public void onNeighborBlockChange(World world, int x, int y, int z,
+                                      int blockID)
+    {
+        // TODO
+    }
+
+    @Override
+    public TileEntity createNewTileEntity(World world)
+    {
+        return new TileEntityFPGA();
+    }
+
+    @Override
+    public int isProvidingStrongPower(IBlockAccess blockAccess, int x, int y,
+                                      int z, int side)
+    {
+        return this.isProvidingWeakPower(blockAccess, x, y, z, side);
+    }
+
+    @Override
+    public int isProvidingWeakPower(IBlockAccess blockAccess, int x, int y,
+                                    int z, int side)
+    {
+        // TODO Modify to use values
+        TileEntityFPGA tile = (TileEntityFPGA) blockAccess
+                .getBlockTileEntity(x, y, z);
+        if (tile.values[this.side_transformer[side] + 19] > 0)
+        {
+            return tile.values[this.side_transformer[side] + 19];
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    @Override
+    public int tickRate(World par1World)
+    {
+        return 40;
+    }
+
+    public void updateTileValues(World world, TileEntityFPGA tile)
+    {
+        // TODO Modify after connections are corrected
+        tile.values[0] = world
+                .getIndirectPowerLevelTo(tile.xCoord, tile.yCoord - 1,
+                                         tile.zCoord, this.side_transformer[0]);
+        tile.values[1] = world
+                .getIndirectPowerLevelTo(tile.xCoord, tile.yCoord + 1,
+                                         tile.zCoord, this.side_transformer[1]);
+        tile.values[2] = world
+                .getIndirectPowerLevelTo(tile.xCoord, tile.yCoord,
+                                         tile.zCoord - 1,
+                                         this.side_transformer[2]);
+        tile.values[3] = world
+                .getIndirectPowerLevelTo(tile.xCoord, tile.yCoord,
+                                         tile.zCoord + 1,
+                                         this.side_transformer[3]);
+        tile.values[4] = world
+                .getIndirectPowerLevelTo(tile.xCoord - 1, tile.yCoord,
+                                         tile.zCoord, this.side_transformer[4]);
+        tile.values[5] = world
+                .getIndirectPowerLevelTo(tile.xCoord + 1, tile.yCoord,
+                                         tile.zCoord, this.side_transformer[5]);
+
+        for (int x = 6; x <= 12; ++x)
+        {
+            if (tile.connections[x] >= 0)
+            {
+                tile.values[x] = tile.values[tile.connections[x]];
+            }
+            else
+            {
+                tile.values[x] = 0;
+            }
+        }
+
+        int lut_input = 0;
+        if (tile.values[6] > 7)
+        {
+            lut_input |= 1;
+        }
+        if (tile.values[7] > 7)
+        {
+            lut_input |= 2;
+        }
+        if (tile.values[8] > 7)
+        {
+            lut_input |= 4;
+        }
+
+        tile.values[13] = (tile.lut_vals[lut_input] & 1) == 1 ? 15 : 0;
+        tile.values[14] = (tile.lut_vals[lut_input] >> 4 & 1) == 1 ? 15 : 0;
+
+        tile.ff_vals[0] = tile.values[9];
+        tile.values[15] = tile.ff_vals[0];
+        tile.values[16] = 15 - tile.ff_vals[0];
+
+        tile.ff_vals[1] = tile.values[11];
+        tile.values[17] = tile.ff_vals[1];
+        tile.values[18] = 15 - tile.ff_vals[1];
+
+        for (int x = 19; x <= 24; ++x)
+        {
+            if (tile.connections[x] >= 0)
+            {
+                tile.values[x] = tile.values[tile.connections[x]];
+            }
+            else
+            {
+                tile.values[x] = 0;
+            }
+        }
+
+        for (int val : tile.values)
+        {
+            System.out.print(val + ", ");
+        }
+        System.out.println("");
+    }
+
+    @Override
+    public void updateTick(World par1World, int blockX, int blockY, int blockZ,
+                           Random par5Random)
+    {
+        System.out.println("Ticking");
+        TileEntityFPGA tile = (TileEntityFPGA) par1World
+                .getBlockTileEntity(blockX, blockY, blockZ);
+        this.updateTileValues(par1World, tile);
+        par1World.notifyBlocksOfNeighborChange(blockX, blockY, blockZ,
+                                               this.blockID);
+        par1World.scheduleBlockUpdate(blockX, blockY, blockZ, this.blockID,
+                                      this.tickRate(par1World));
+    }
 }
