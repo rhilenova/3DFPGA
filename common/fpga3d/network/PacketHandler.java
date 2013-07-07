@@ -43,7 +43,10 @@ public class PacketHandler implements IPacketHandler
     {
         int[] connections = new int[Reference.Constants.NUM_ENDPOINTS];
         int[] values = new int[Reference.Constants.NUM_ENDPOINTS];
+        int[] ff_vals = new int[2]; // TODO Reference
         int[] lut_vals = new int[Reference.Constants.LUT_SIZE];
+        boolean is_hard_decision = false;
+        
         try
         {
             for (int conn = 0; conn < connections.length; ++conn)
@@ -54,10 +57,15 @@ public class PacketHandler implements IPacketHandler
             {
                 values[val] = dis.readInt();
             }
+            for (int ff_val = 0; ff_val < ff_vals.length; ++ff_val)
+            {
+                ff_vals[ff_val] = dis.readInt();
+            }
             for (int lut = 0; lut < lut_vals.length; ++lut)
             {
                 lut_vals[lut] = dis.readInt();
             }
+            is_hard_decision = dis.readBoolean();
         }
         catch (IOException e)
         {
@@ -86,7 +94,8 @@ public class PacketHandler implements IPacketHandler
         }
 
         TileEntityFPGA tile_fpga = (TileEntityFPGA) tile;
-        tile_fpga.setUpdate(connections, values, lut_vals);
+        tile_fpga.setUpdate(connections, values, ff_vals, lut_vals,
+                            is_hard_decision);
     }
 
     public static void parseMessage(DataInputStream dis, int id)

@@ -138,7 +138,13 @@ public class BlockFPGA extends Block implements ITileEntityProvider
         // TODO Modify to use values
         TileEntityFPGA tile = (TileEntityFPGA) blockAccess
                 .getBlockTileEntity(x, y, z);
-        if (tile.values[this.side_transformer[side] + 19] > 0)
+        if (tile.is_hard_decision &&
+            tile.values[this.side_transformer[side] + 19] > 7)
+        {
+            return 15;
+        }
+        else if (!tile.is_hard_decision &&
+                 tile.values[this.side_transformer[side] + 19] > 0)
         {
             return tile.values[this.side_transformer[side] + 19];
         }

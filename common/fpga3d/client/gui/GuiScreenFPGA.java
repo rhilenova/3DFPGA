@@ -76,6 +76,7 @@ public class GuiScreenFPGA extends GuiContainer
     boolean[] is_connection = new boolean[Reference.Constants.NUM_ENDPOINTS];
     int[] connection_endpoints = {6, 7, 8, 9, 10, 11, 12, 19, 20, 21, 22, 23,
                                   24};
+    GuiButton hard_decision;
 
     int[][] legal_connections = {this.input_connections,
                                  this.input_connections,
@@ -168,6 +169,9 @@ public class GuiScreenFPGA extends GuiContainer
             temp.drawButton = false;
             this.buttonList.add(temp);
         }
+        hard_decision = new GuiButton(100, k + 121, l + 5, 109, 20,
+                                                "Soft Decision");
+        this.buttonList.add(hard_decision);
     }
 
     /**
@@ -237,11 +241,27 @@ public class GuiScreenFPGA extends GuiContainer
             PacketDispatcher.sendPacketToServer(this.tile
                     .getDescriptionPacket());
         }
+        // Handle decision button
+        else if (ID == 100)
+        {
+            this.tile.is_hard_decision = !this.tile.is_hard_decision;
+            PacketDispatcher.sendPacketToServer(this.tile
+                                                .getDescriptionPacket());
+        }
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int x, int y)
     {
+        if (this.tile.is_hard_decision)
+        {
+            hard_decision.displayString = "Hard Decision";
+        }
+        else
+        {
+            hard_decision.displayString = "Soft Decision";
+        }
+        
         // Draw LUT static text
         this.fontRenderer.drawString("LUT", 72, 10, 4210752);
         this.fontRenderer.drawString("000", 50, 24, 4210752);
