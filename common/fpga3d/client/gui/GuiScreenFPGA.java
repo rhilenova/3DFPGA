@@ -124,8 +124,8 @@ public class GuiScreenFPGA extends GuiContainer
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question. TODO
-     * cleanup?
+     * Adds the buttons (and other controls) to the screen in question.
+     * TODO cleanup?
      */
     @Override
     @SuppressWarnings("unchecked")

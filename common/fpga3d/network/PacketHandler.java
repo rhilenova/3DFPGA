@@ -43,7 +43,7 @@ public class PacketHandler implements IPacketHandler
     {
         int[] connections = new int[Reference.Constants.NUM_ENDPOINTS];
         int[] values = new int[Reference.Constants.NUM_ENDPOINTS];
-        int[] ff_vals = new int[2]; // TODO Reference
+        int[] ff_vals = new int[Reference.Constants.FF_SIZE];
         int[] lut_vals = new int[Reference.Constants.LUT_SIZE];
         boolean is_hard_decision = false;
         

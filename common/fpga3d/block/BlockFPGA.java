@@ -115,7 +115,8 @@ public class BlockFPGA extends Block implements ITileEntityProvider
     public void onNeighborBlockChange(World world, int x, int y, int z,
                                       int blockID)
     {
-        // TODO
+        TileEntityFPGA tile = (TileEntityFPGA) world.getBlockTileEntity(x, y, z);
+        updateTileValues(world, tile, false);
     }
 
     @Override
@@ -135,7 +136,6 @@ public class BlockFPGA extends Block implements ITileEntityProvider
     public int isProvidingWeakPower(IBlockAccess blockAccess, int x, int y,
                                     int z, int side)
     {
-        // TODO Modify to use values
         TileEntityFPGA tile = (TileEntityFPGA) blockAccess
                 .getBlockTileEntity(x, y, z);
         if (tile.is_hard_decision &&
@@ -160,9 +160,10 @@ public class BlockFPGA extends Block implements ITileEntityProvider
         return 40;
     }
 
-    public void updateTileValues(World world, TileEntityFPGA tile)
+    public void updateTileValues(World world, TileEntityFPGA tile,
+                                 boolean is_tick)
     {
-        // TODO Modify after connections are corrected
+        // TODO Cleanup
         tile.values[0] = world
                 .getIndirectPowerLevelTo(tile.xCoord, tile.yCoord - 1,
                                          tile.zCoord, this.side_transformer[0]);
@@ -213,13 +214,60 @@ public class BlockFPGA extends Block implements ITileEntityProvider
         tile.values[13] = (tile.lut_vals[lut_input] & 1) == 1 ? 15 : 0;
         tile.values[14] = (tile.lut_vals[lut_input] >> 4 & 1) == 1 ? 15 : 0;
 
-        tile.ff_vals[0] = tile.values[9];
-        tile.values[15] = tile.ff_vals[0];
-        tile.values[16] = 15 - tile.ff_vals[0];
+        // Only update on clock (if connected) or on tick.
+        boolean update_ff0 = false;
+        if (tile.connections[10] >= 0 && tile.is_hard_decision)
+        {
+            if (tile.last_ff_0 == 0 && tile.values[10] == 15)
+            {
+                update_ff0 = true;
+            }
+        }
+        else if (tile.connections[10] >= 0 && !tile.is_hard_decision)
+        {
+            if (tile.last_ff_0 <= 7 && tile.values[10] > 7)
+            {
+                update_ff0 = true;
+            }
+        }
+        else if (tile.connections[10] < 0 && is_tick)
+        {
+            update_ff0 = true;
+        }
 
-        tile.ff_vals[1] = tile.values[11];
-        tile.values[17] = tile.ff_vals[1];
-        tile.values[18] = 15 - tile.ff_vals[1];
+        if (update_ff0)
+        {
+            tile.ff_vals[0] = tile.values[9];
+            tile.values[15] = tile.ff_vals[0];
+            tile.values[16] = 15 - tile.ff_vals[0];
+        }
+
+        boolean update_ff1 = false;
+        if (tile.connections[12] >= 0 && tile.is_hard_decision)
+        {
+            if (tile.last_ff_1 == 0 && tile.values[12] == 15)
+            {
+                update_ff1 = true;
+            }
+        }
+        else if (tile.connections[12] >= 0 && !tile.is_hard_decision)
+        {
+            if (tile.last_ff_1 <= 7 && tile.values[12] > 7)
+            {
+                update_ff1 = true;
+            }
+        }
+        else if (tile.connections[12] < 0 && is_tick)
+        {
+            update_ff1 = true;
+        }
+
+        if (update_ff1)
+        {
+            tile.ff_vals[1] = tile.values[11];
+            tile.values[17] = tile.ff_vals[1];
+            tile.values[18] = 15 - tile.ff_vals[1];
+        }
 
         for (int x = 19; x <= 24; ++x)
         {
@@ -232,22 +280,18 @@ public class BlockFPGA extends Block implements ITileEntityProvider
                 tile.values[x] = 0;
             }
         }
-
-        for (int val : tile.values)
-        {
-            System.out.print(val + ", ");
-        }
-        System.out.println("");
+        
+        tile.last_ff_0 = tile.values[10];
+        tile.last_ff_1 = tile.values[12];
     }
 
     @Override
     public void updateTick(World par1World, int blockX, int blockY, int blockZ,
                            Random par5Random)
     {
-        System.out.println("Ticking");
         TileEntityFPGA tile = (TileEntityFPGA) par1World
                 .getBlockTileEntity(blockX, blockY, blockZ);
-        this.updateTileValues(par1World, tile);
+        this.updateTileValues(par1World, tile, true);
         par1World.notifyBlocksOfNeighborChange(blockX, blockY, blockZ,
                                                this.blockID);
         par1World.scheduleBlockUpdate(blockX, blockY, blockZ, this.blockID,

@@ -42,5 +42,6 @@ public class Reference
     {
         public static final int NUM_ENDPOINTS = 25;
         public static final int LUT_SIZE = 8;
+        public static final int FF_SIZE = 2;
     }
 }

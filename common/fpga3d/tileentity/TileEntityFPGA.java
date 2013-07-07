@@ -15,9 +15,10 @@ public class TileEntityFPGA extends TileEntity
 {
     public int[] connections = new int[Reference.Constants.NUM_ENDPOINTS];
     public int[] values = new int[Reference.Constants.NUM_ENDPOINTS];
-    public int[] ff_vals = new int[2]; // TODO reference
+    public int[] ff_vals = new int[Reference.Constants.FF_SIZE];
     public int[] lut_vals = new int[Reference.Constants.LUT_SIZE];
     public boolean is_hard_decision = false;
+    public int last_ff_0 = 0, last_ff_1 = 0;
 
     public TileEntityFPGA()
     {
