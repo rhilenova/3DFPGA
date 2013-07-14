@@ -39,8 +39,9 @@ public class BlockFPGA extends Block implements ITileEntityProvider
         this.iconArray = new Icon[6];
         for (int i = 0; i < this.iconArray.length; ++i)
         {
-            this.iconArray[i] = iconRegister.registerIcon(Reference.MOD_ID
-                    .toLowerCase() + ":" + this.getUnlocalizedName2() + i);
+            this.iconArray[i] =
+                iconRegister.registerIcon(Reference.MOD_ID.toLowerCase() + ":" +
+                                          Reference.Strings.FPGA_NAME + i);
         }
     }
 

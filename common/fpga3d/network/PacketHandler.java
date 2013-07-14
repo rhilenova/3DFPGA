@@ -81,7 +81,7 @@ public class PacketHandler implements IPacketHandler
         else
         {
             if (FMLClientHandler.instance().getClient().theWorld.getWorldInfo()
-                    .getDimension() == dim)
+                    .getVanillaDimension() == dim)
             {
                 tile = FMLClientHandler.instance().getClient().theWorld
                         .getBlockTileEntity(x, y, z);

@@ -2,13 +2,10 @@ package fpga3d;
 
 import net.minecraft.creativetab.CreativeTabs;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.Init;
+import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.Mod.PostInit;
-import cpw.mods.fml.common.Mod.PreInit;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -33,9 +30,9 @@ public class FPGA3D
                                                                       .getNextID(),
                                                               Reference.MOD_ID);
 
-    private static String[] localeFiles = {"/mods/fpga3d/lang/en_US.xml"};
+    private static String[] localeFiles = {"/assets/fpga3d/lang/en_US.xml"};
 
-    @PreInit
+    @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         // Initialize mod blocks
@@ -52,7 +49,7 @@ public class FPGA3D
         }
     }
 
-    @Init
+    @EventHandler
     public void load(FMLInitializationEvent event)
     {
         // Register the GUI Handler
@@ -60,10 +57,5 @@ public class FPGA3D
 
         // Initialize mod tile entities
         proxy.registerTileEntities();
-    }
-
-    @PostInit
-    public void postInit(FMLPostInitializationEvent event)
-    {
     }
 }

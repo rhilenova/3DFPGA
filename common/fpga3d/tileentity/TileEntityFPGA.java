@@ -46,7 +46,7 @@ public class TileEntityFPGA extends TileEntity
         try
         {
             dos.writeInt(Reference.MessageIDs.FPGA);
-            dos.writeInt(this.worldObj.getWorldInfo().getDimension());
+            dos.writeInt(this.worldObj.getWorldInfo().getVanillaDimension());
 
             dos.writeInt(this.xCoord);
             dos.writeInt(this.yCoord);

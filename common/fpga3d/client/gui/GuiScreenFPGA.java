@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.util.ResourceLocation;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import fpga3d.Reference;
 import fpga3d.inventory.ContainerFPGA;
@@ -352,7 +353,9 @@ public class GuiScreenFPGA extends GuiContainer
     @Override
     protected void drawGuiContainerBackgroundLayer(float opacity, int x, int y)
     {
-        this.mc.renderEngine.bindTexture(Reference.Textures.GUI_FPGA);
+        this.mc.renderEngine.func_110577_a(
+            new ResourceLocation(Reference.MOD_ID.toLowerCase(),
+                                 Reference.Textures.GUI_FPGA));
         int k = (this.width - this.xSize) / 2;
         int l = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
