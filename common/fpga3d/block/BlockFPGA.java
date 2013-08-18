@@ -76,6 +76,8 @@ public class BlockFPGA extends Block implements ITileEntityProvider
                                     EntityPlayer par5EntityPlayer, int par6,
                                     float par7, float par8, float par9)
     {
+        if(par5EntityPlayer.isSneaking()) return false;
+        
         if (par1World.isRemote)
         {
             return true;
