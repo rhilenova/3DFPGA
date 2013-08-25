@@ -23,7 +23,8 @@ public class Reference
 
     public static final class BlockIDs
     {
-        public static final int FPGA = 2540;
+        public static final int FPGA_DEFAULT = 2540;
+        public static int FPGA;
     }
 
     public static final class Textures

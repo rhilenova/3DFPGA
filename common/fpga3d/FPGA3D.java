@@ -1,5 +1,7 @@
 package fpga3d;
 
+import java.io.File;
+
 import net.minecraft.creativetab.CreativeTabs;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
@@ -14,6 +16,7 @@ import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import fpga3d.block.ModBlocks;
+import fpga3d.configuration.FPGA3DConfiguration;
 import fpga3d.core.proxy.CommonProxy;
 import fpga3d.creativetab.CreativeTabFPGA;
 import fpga3d.network.PacketHandler;
@@ -38,6 +41,9 @@ public class FPGA3D
     @PreInit
     public void preInit(FMLPreInitializationEvent event)
     {
+    	FPGA3DConfiguration.init(new File(event.getModConfigurationDirectory().getAbsolutePath() + File.separator +
+    									  Reference.MOD_CHANNEL + File.separator + Reference.MOD_ID + ".cfg"));
+    	
         // Initialize mod blocks
         ModBlocks.init();
 
